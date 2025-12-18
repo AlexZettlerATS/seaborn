@@ -9,7 +9,7 @@ import itertools
 import textwrap
 from contextlib import contextmanager
 from collections import abc
-from collections.abc import Callable, Generator, Mapping
+from collections.abc import Callable, Generator
 from typing import Any, List, Literal, Optional, cast
 from xml.etree import ElementTree
 
@@ -859,7 +859,7 @@ class Plot:
 
     # TODO def legend (ugh)
 
-    def theme(self, config: Mapping[str, Any], /) -> Plot:
+    def theme(self, config: dict[str, Any], /) -> Plot:
         """
         Control the appearance of elements in the plot.
 
@@ -1751,7 +1751,7 @@ class Plotter:
         # keeps it inside the axes (though still attached to the figure)
         # This is necessary because matplotlib layout engines currently don't
         # support figure legends — ideally this will change.
-        loc = "center right" if self._pyplot else "center left"
+        loc = "center right" if self._pyplot else "center right"
 
         base_legend = None
         for (name, _), (handles, labels) in merged_contents.items():
@@ -1761,8 +1761,11 @@ class Plotter:
                 handles,  # type: ignore  # matplotlib/issues/26639
                 labels,
                 title=name,
+                title_fontproperties={'weight': 'bold'},
+                alignment='left',
                 loc=loc,
-                bbox_to_anchor=(.98, .55),
+                #ncols=2,
+                bbox_to_anchor=(.90, .40),
             )
 
             if base_legend:
@@ -1795,6 +1798,7 @@ class Plotter:
                     if isinstance(b, str):
                         hi = cast(float, hi) + 0.5
                     ax.set(**{f"{axis}lim": (lo, hi)})
+                    ax.xaxis.grid(False)
 
                 if axis_key in self._scales:  # TODO when would it not be?
                     self._scales[axis_key]._finalize(p, axis_obj)
